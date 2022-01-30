@@ -39,26 +39,26 @@ This is a software which could storage your accounts and passwords as a local fi
 
 - **Key**: The key you set on cipherBook
 - **Question**: Tip message
-- Attention: You must input your file-path correctly whatever you want to do in 1st menu. I suggest you input the FULL-path of your file(E:/Cache/xxx.key) . You should know when you just input your file name, the program just find you file in current path.
+- Attention: You must input your file-path correctly whatever you want to do in 1st menu. I suggest you input the FULL-path of your file(E:/Cache/xxx.key) . You should know when you just input your file name, the program will only find your file in current path.
 - When you use this program for first-time, you should create a cipherBook. Please input **1** when you get into this program. And you could modify your book according to menu prompts.
-- Attention: you must set your **Key, Question** to make sure you could use your cipherBook properly.(If you're not set, Key will be initialized as *'None'*) Make sure choose **y** when you quit program when you want to save your change.
+- Attention: you must set your **Key, Question** to make sure you could use your cipherBook properly.(If you're not set, Key will be initialized as *'None'*) Make sure choose **y** when you quit program and you want to save your change.
 - Now you have a cipherBook. If you want to check or modify, you should input your **Key** correctly.
 
 
 
 ## Main Logic
 
-I plan to build a password manual  **cipherBook** which could save your passwords as local file safely. File could store as plaintext, others cannot break it easily at same time. Only you know the important **Key**. 
+I plan to build a password manual  **cipherBook** which could storage your passwords as local file safely. File could store as plaintext, others cannot break it easily at same time. Only you know the important **Key**. 
 
 After learning through website and my "careful selection", I adopted **AES-256** with CBC, padding by **PKCS7**.
 
 This require several parameters: *Key, IV, content*
 
-* **Key**: Due to the block encryption feature of CBC, it need length of 32 bytes string as key. Here, I encrypt each letter of your **Key** with **sha512** and connect, then use the concatenated string to convert to bytes format with **sha256**. In this way, could meet the requirement of **AES-256** with 32 bytes.
+* **Key**: Due to the block encryption feature of CBC, it need length of 32 bytes string as key. Here, I encrypt each letter of your input **Key** with **sha512** and connect, then use the concatenated string to convert to bytes format with **sha256**. In this way, could meet the requirement of **AES-256** with 32 bytes.
 
 * **IV**: Similarly, IV need 16 bytes as padding. In order not to duplicate with **Key**, I made a small change: Take first half of **Key** with **sha512**, turn to bytes format with **md5** after connection. 16 bytes exactly.
 
-* **Content**: Of course, that's the content you want to storage. Using dictionary storage.
+* **Content**: Of course, that's the content you want to storage. Using dictionary structure.
 
 	As new version, format could be open more openness, allowed to nesting. But you still need to follow the basic rule of dictionary.
 
