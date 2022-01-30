@@ -63,20 +63,20 @@ This require several parameters: *Key, IV, content*
 	As new version, format could be open more openness, allowed to nesting. But you still need to follow the basic rule of dictionary.
 
 	```python
-	dict = {'name':{'username': password}}		# old version
+	dict = {'name':{'username': password}}			# old version
 	
 	
-	'''									# level层级概念
-	twitter:							# level1
+	'''							# level concept
+	twitter:						# level1
 		account name: 111				# level2
 		password:
 			No.1: 000000				# level3
 			No.2: 654321
 		mention: Important!
-	Gmail:								# level1
+	Gmail:							# level1
 		account_name: 1111@gmail.com
 		password: xxxx
-	'''											# new version
+	'''							# new version
 	```
 
 * About **PKCS7**
