@@ -1,127 +1,166 @@
 # AES_CipherBook
 
-<font size = 6 color = 'red'>**Hi, Github!**</font> 
+<font size = 6 color = 'red'>**Hi, GitHub!**</font> 
 
-## 写在前面
+## Before start
 
-我是**Gandaove**，一个程序菜鸟。我注册Github账号已经有点年头了，一直在“学习”各个大佬们的代码，没想到，也有我上传代码的时候。是的，这是我的第一个上传至Github上的代码。
+I'm gandaove, new of GitHub. I have been registed my GitHub account for a few years now, always "learning" the code of masters. So yeah, that's my first project I upload to GitHub.
 
-前几天我在刷网站，偶然发现了名为**1password**的工具，这引起了我的兴趣。我决定尝试做一个类似的东西。于是——它就这么产生了。
-
-
-
-## 库的引用
-
-* **Crypto.Cipher(pycryptodome)**: 它是最主要的库，提供了AES-256的核心加密算法
-* **base64**: 将内容加密完后，由base64再次封装
-* **os**: 系统库
-* **time**: 主要用于显示暂停
-* **hashlib**: 用于对密钥与密保答案的哈希计算，下文会提到
+Once I just browsed the website, and I found a kind of 'useful' tool named **1password**, that caught my interest. So I decided to do a similar thing. And... It's just came out!
 
 
 
-## 编写环境
+## Modules to Import 
+
+* **Crypto.Cipher(pycryptodome)**: It's the most important module, it provide the main algorithm of AES-256.
+* **base64**: After the content is encrypted, base64 will package it for 2nd time.
+* **os.system**: System module, mainly used to suspend.
+* **time.sleep**: Time module, used to suspend.
+* **hashlib**: Calculate **Key**'s hash. I'll mention it below.
+
+
+
+## Compiler Environment
 
 * Windows 10 64bit 20H2
-* Python 3.9.1
-* VSCode (pyinstaller打包)
-* 后为兼顾兼容性使用Windows 7 64bit(Python 3.8.10)纯净环境打包
+* Python 3.9.5
+* VSCode (pyinstaller for package)
+* Use Windows 7 64bit(Python 3.8.10) to pack for compatibility and pure environment.
 
 
 
-## 主要功能
+## Main Features
 
-这是一款能够将您的账号密码保存在一个本地文件的软件。为您的**cipherBook**添加密钥与密保，并且记住它，按照软件提示操作，于是您就可以向其中添加您难以记住的密码了！
-
-
-
-## 使用说明
-
-* **Key**: 密钥
-	**Question**: 您设置的密保问题
-	**Answer**: 您设置的密保答案
-
-* 注意：进入一级菜单时无论你想进行何种操作，您必须先输入文件路径。推荐每次输入文件路径时输入绝对路径(例：E:\Cache\Key.txt)。当您只输入文件名时，程序会在程序所在目录下寻找文件。
-* 在您第一次使用时，需要创建一个cipherBook。请您在进入程序时选择**1**，然后按照菜单标注的操作来进行增删改查以及安全设置的更改。
-	注意：您需要设置您的**Key、Question、Answer**以确保您可以正确使用您的cipherBook(若您未设置，**Key、Answer**将会初始化为*'None'*)，并确保在退出选项时选择'y'以保存您的密码本。(程序内有提示)
-* 您现在可能已经有了一个密码本，现在想要进行查阅或更改。那么您需要输入您的**Answer、Key**。输入正确后，您可以进入如同您第一次创建cipherBook时见到的菜单。在您完成操作后，您可以选择是否保存更改。
+This is a software which could storage your accounts and passwords as a local file safely. Set a Key for your **cipherBook** and remember it, So you could add your complex message securely!
 
 
 
-## 核心逻辑
+## Instruction
 
-我打算建立一个存储在本地的文件密码本**cipherBook**。文件能够以加密明文存储，而其他人又无法从txt保存内容中轻易得知我的账号密码。只有掌握密钥**key**和密保问题**answer**的您自己知道。所以程序自带双重验证。
+- **Key**: The key you set on cipherBook
+- **Question**: Tip message
+- Attention: You must input your file-path correctly whatever you want to do in 1st menu. I suggest you input the FULL-path of your file(E:/Cache/xxx.key) . You should know when you just input your file name, the program just find you file in current path.
+- When you use this program for first-time, you should create a cipherBook. Please input **1** when you get into this program. And you could modify your book according to menu prompts.
+- Attention: you must set your **Key, Question** to make sure you could use your cipherBook properly.(If you're not set, Key will be initialized as *'None'*) Make sure choose **y** when you quit program when you want to save your change.
+- Now you have a cipherBook. If you want to check or modify, you should input your **Key** correctly.
 
-通过网站学习与我的“精心挑选”，最终我采用了目前较为普遍的**AES-256**加密的CBC模式，并以**PKCS7**标准填充；整个cipherBook采用txt文件储存，没有对文件设置读写权限。
 
-那么这就需要几个参数: *Key, IV向量, 加密内容*
 
-- *Key*：由于CBC的块加密特点，所以需要32bytes作为密钥。这里我用**sha256**算法将您想设置的密码转为哈希的bytes格式，正好32bytes，以满足**AES-256**的要求
+## Main Logic
 
-- *IV*：相对的，IV则需要16bytes作为填充，为了不与Key相重复，我做了一点小小的改动：为您设定一个密码保护，您设置一个您可以记住答案的问题，并将**Question  Answer**记录在txt中。IV用**md5**算法将Key与IV的***连接***的明文转为哈希的bytes格式，正好16bytes
+I plan to build a password manual  **cipherBook** which could save your passwords as local file safely. File could store as plaintext, others cannot break it easily at same time. Only you know the important **Key**. 
 
-- 加密内容：当然，也就是您想要存储的账号与密码；采用字典储存。
+After learning through website and my "careful selection", I adopted **AES-256** with CBC, padding by **PKCS7**.
+
+This require several parameters: *Key, IV, content*
+
+* **Key**: Due to the block encryption feature of CBC, it need length of 32 bytes string as key. Here, I encrypt each letter of your **Key** with **sha512** and connect, then use the concatenated string to convert to bytes format with **sha256**. In this way, could meet the requirement of **AES-256** with 32 bytes.
+
+* **IV**: Similarly, IV need 16 bytes as padding. In order not to duplicate with **Key**, I made a small change: Take first half of **Key** with **sha512**, turn to bytes format with **md5** after connection. 16 bytes exactly.
+
+* **Content**: Of course, that's the content you want to storage. Using dictionary storage.
+
+	As new version, format could be open more openness, allowed to nesting. But you still need to follow the basic rule of dictionary.
 
 	```python
-	dict = {'name':{'username': password}}			# 格式
+	dict = {'name':{'username': password}}		# old version
+	
+	
+	'''									# level层级概念
+	twitter:							# level1
+		account name: 111				# level2
+		password:
+			No.1: 000000				# level3
+			No.2: 654321
+		mention: Important!
+	Gmail:								# level1
+		account_name: 1111@gmail.com
+		password: xxxx
+	'''											# new version
 	```
 
-- 关于**PKCS7**  
-	PKCS7规定了内容的一种填充标准，以保证AES-256(CBC)能正确地加密解密。一般情况下填充标准为16bytes，这里我设置为了32bytes。填充内容为ASCII字符(1~31)。
-	有了这些，就可以将您的内容加密了！
-	
-- **关于txt**
+* About **PKCS7**
 
-	实际上，目前我只尝试过txt格式，其它保存格式我并没有加以限制。第一行的内容为您设置的问题，采用明文保存；第二行的内容为**answer**的**sha256**-十六进制格式；第三行的内容为字典**dict**。
+	**PKCS7** prescript a kind of padding standard to make sure **AES-256(CBC)** could encrypt and decrypt correctly. Usually, Key padding standard is 16 bytes, here I set it as double. Padding content are ASCII(1~31).
 
-所以，加密的核心思路为：首先录入您需要保存的账号密码，然后将字典content转换为str，通过填充函数来填充十六进制字符；将您键入的**Key**通过**sha256**加密作为key，字符串**Key+Answer**通过**md5**加密作为IV，通过加密库加密，再用base64进一步打包。存储时，**Question**以明文保存在文件第一行，**Answer**的**sha256**(十六进制)在第二行，加密密文在第三行。
+* About format of storage file
 
-~~我觉得我的方法还是有所创新的。~~ 
+	In fact, there are no strict circumstance on file format. First line of file is tip sentence. Second line is **key** with double hash(hex). Third is content dictionary.
 
+So, core idea is: first input your content, and turn the content dictionary to string, padding with padding function. Encrypt the key you typed with double hash(sha256) as **Key**. First half of **Key** treat as **IV** through double hash(md5). Using base64 for further packaging.
 
-
-## 主要函数
-
-* `def encrypt_AES(key, iv, content)` 
-	是的，这是整个程序的核心。首先new一个AES类，将内容通过KEY与IV加密，再用base64封装
-* `def decrypt_AES(key, iv, content)` 
-	正如您所想，这个程序是与encrypt相反的解密程序
-* `def pkcs7_pad(content, block_size=32)     # 借鉴`  
-	此函数为填充函数，以保证每一块待加密内容均为32bytes。content为待填充的明文。填充规则为
-	- 计算出规则下需要填充的数量**padding**
-	- 填充内容为**padding**数字所对应的ASCII值**pad_asc**的十六进制格式
-	- `return (content + pad_asc * padding)`
-* `def verify()`
-	在您读取您的cipherBook之前的认证函数。首先输入**Answer**作为密保验证，**Answer**正确时，输入**key**尝试进行解密，若解密失败则报异常，说明**key**输入错误。每一次输入错误会减掉您一次机会。
-	*请注意：文件路径**path**输入错误时会退出程序* 
-* `def deleteFile(fileName)` 
-  我设置了您最多有8次输入**Key和Answer**的机会，无论任何一个输入错误都会减掉您1次机会。您没有机会时，函数将会把您的文件删除。
+~~I think my opinion have some innovation.~~ 
 
 
 
-## 缺陷与潜力
+## Main Module
 
-当然，即便在方法上有所创新，程序依然需要进一步改进。本来这也算我一时冲动做出来的东西，从出现想法到第一个版本总共仅4天时间。
+- AES_cipherBook
 
-1. 过于依赖Python库。里面的很多方法非常依赖Python库，可以加入更多原创的方法。
-2. 程序结构较为繁琐，有进一步优化空间。
-3. 目前只进行了Windows适配。
-3. 兼容性的潜在问题。
-4. 没有设计GUI界面，黑色的控制台界面显得尤为单调。
-4. 可添加多语言支持。
-5. 存储形式较为单调，目前仅支持 `name:{username: password}`格式。
-6. 我正在考虑向程序加入一些密码检测规则，对您的密码强度进行评估，并给出建议。
-6. 明文内容易被破坏；文件存储格式可以进一步封装、加密。
-6. cipherBook同步至某云端。
+	Main function part, mainly to call large modules.
+
+- Function
+
+	Mark functions more specifically, include create, read cipherBook and manipulate part.
+
+- Modify_dict
+
+	Modifying module
+
+- Security
+
+	Encrypt, verify module
+
+- Menus
+
+	Menu module
+
+- Error_res
+
+	Part of Error, quit solution module
+
+- Input
+
+	Input module(support ctrl+c to cancel input)
 
 
 
-## 版本更新
+## Defects && Improvements
+
+For definitely, even through I have some innovation on opinions, the whole program still need to improve. Well, I have to admit that's a project of impulse. v1.0 took only 4 days.
+
+1. Too reliance on Python modules. I could join more original functions.
+2. ~~The structure of project is cumbersome, could be more optimization.~~
+3. Currently only adaptation to Windows.
+4. Potential Compatibility problem.
+5. No GUI. Looks particularly monotonous with black console interface.
+6. Multi-language support.
+7. ~~Monotonous storage mode. Now only `name: {username: password}` is available.~~
+8. I'm considering adding some rules of password detection. Your password's strength could be evaluated and give you suggestions.
+9. Plaintext is easy to destroy. The file format could package further or encrypt.
+10. Sync to xxxcloud.
+
+
+
+## Update Logs
 
 ### v1.0
 
-这是我的第一个制作版本。
+My first product version.
+
+
 
 ### v1.1
 
-这是我的第一个上传版本。对程序结构进行进一步改良，修复了输入中文的出错问题，修复了若干小bug。出于兼容性考虑，我在 Windows7 虚拟机上的纯净环境进行了exe打包。
+My first upload version. I improved program structure, fixed Chinese input problem and several bug. For compatibility reasons, I packaged .exe file on the pure environment of Windows 7 virtual machine.
+
+
+
+### v1.2
+
+A great update. This includes:
+
+1. Rebuild code. All code is modularized by function to enhance readability.
+2. Update algorithm of hash, make the break harder.
+3. Delete set of **answer**. For now, **question** could used for tip.
+4. Expanding format of storage. Expanded from storing only accounts & passwords to a more free format. Add new **level** hierarchy concept. You could expand  the storage tiers infinitely. Support storage on same tier.
