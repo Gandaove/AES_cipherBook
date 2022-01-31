@@ -4,9 +4,9 @@
 
 ## Before start
 
-I'm gandaove, new of GitHub. I have been registed my GitHub account for a few years now, always "learning" the code of masters. So yeah, that's my first project I upload to GitHub.
+I'm gandaove, new of GitHub. I have been registered my GitHub account for a few years now, always "learning" the code of masters. So yeah, that's my first project I upload to GitHub.
 
-Once I just browsed the website, and I found a kind of 'useful' tool named **1password**, that caught my interest. So I decided to do a similar thing. And... It's just came out!
+Once I just browsed the website, and I found a kind of "useful" tool named **1password**, that caught my interest. So I decided to do a similar thing. And... It's just came out!
 
 
 
@@ -39,7 +39,7 @@ This is a software which could storage your accounts and passwords as a local fi
 
 - **Key**: The key you set on cipherBook
 - **Question**: Tip message
-- Attention: You must input your file-path correctly whatever you want to do in 1st menu. I suggest you input the FULL-path of your file(E:/Cache/xxx.key) . You should know when you just input your file name, the program will only find your file in current path.
+- Attention: You must input your file-path correctly whatever you want to do in 1st menu. I suggest you input the FULL-path of your file(E:/Cache/xxx.key) . You should know when you just input your file name, the program will find your file in current path.
 - When you use this program for first-time, you should create a cipherBook. Please input **1** when you get into this program. And you could modify your book according to menu prompts.
 - Attention: you must set your **Key, Question** to make sure you could use your cipherBook properly.(If you're not set, Key will be initialized as *'None'*) Make sure choose **y** when you quit program and you want to save your change.
 - Now you have a cipherBook. If you want to check or modify, you should input your **Key** correctly.
@@ -48,35 +48,35 @@ This is a software which could storage your accounts and passwords as a local fi
 
 ## Main Logic
 
-I plan to build a password manual  **cipherBook** which could storage your passwords as local file safely. File could store as plaintext, others cannot break it easily at same time. Only you know the important **Key**. 
+I plan to build a password manual  **cipherBook** which could save your passwords as local file safely. File could storage as plaintext, others cannot break it easily at same time. Only you know the important **Key**. 
 
-After learning through website and my "careful selection", I adopted **AES-256** with CBC, padding by **PKCS7**.
+After learning through website and my "careful selection", I adopted **AES-256** with CBC, padding by **PKCS7**. 
 
-This require several parameters: *Key, IV, content*
+This require several parameters: *Key, IV, content* 
 
-* **Key**: Due to the block encryption feature of CBC, it need length of 32 bytes string as key. Here, I encrypt each letter of your input **Key** with **sha512** and connect, then use the concatenated string to convert to bytes format with **sha256**. In this way, could meet the requirement of **AES-256** with 32 bytes.
+* **Key**: Due to the block encryption feature of CBC, it need length of 32 bytes string as key. Here, I encrypt each letter of your **Key** with **sha512** and connect, then use the concatenated string to convert to bytes format with **sha256**. In this way, could meet the requirement of **AES-256** with 32 bytes.
 
 * **IV**: Similarly, IV need 16 bytes as padding. In order not to duplicate with **Key**, I made a small change: Take first half of **Key** with **sha512**, turn to bytes format with **md5** after connection. 16 bytes exactly.
 
-* **Content**: Of course, that's the content you want to storage. Using dictionary structure.
+* **Content**: Of course, that's the content you want to storage. Using dictionary storage.
 
-	As new version, format could be open more openness, allowed to nesting. But you still need to follow the basic rule of dictionary.
+	As new version, format could be more openness, allowed to nesting. But you still need to follow the basic rule of dictionary.
 
 	```python
-	dict = {'name':{'username': password}}			# old version
+	dict = {'name':{'username': 'password'}}		# old version
 	
 	
-	'''							# level concept
-	twitter:						# level1
+	'''									# level concept
+	twitter:							# level1
 		account name: 111				# level2
 		password:
 			No.1: 000000				# level3
 			No.2: 654321
 		mention: Important!
-	Gmail:							# level1
+	Gmail:								# level1
 		account_name: 1111@gmail.com
 		password: xxxx
-	'''							# new version
+	'''											# new version
 	```
 
 * About **PKCS7**
@@ -87,7 +87,7 @@ This require several parameters: *Key, IV, content*
 
 	In fact, there are no strict circumstance on file format. First line of file is tip sentence. Second line is **key** with double hash(hex). Third is content dictionary.
 
-So, core idea is: first input your content, and turn the content dictionary to string, padding with padding function. Encrypt the key you typed with double hash(sha256) as **Key**. First half of **Key** treat as **IV** through double hash(md5). Using base64 for further packaging.
+So, core idea is: first input your content, and turn the content dictionary to string, fill with padding function. Encrypt the key you typed with double hash(sha256) as **Key**. First half of **Key** treat as **IV** through double hash(md5). Using base64 for further packaging.
 
 ~~I think my opinion have some innovation.~~ 
 
@@ -127,7 +127,7 @@ So, core idea is: first input your content, and turn the content dictionary to s
 
 ## Defects && Improvements
 
-For definitely, even through I have some innovation on opinions, the whole program still need to improve. Well, I have to admit that's a project of impulse. v1.0 took only 4 days.
+For definitely, even through I have some innovation opinions, the whole program still need to improve. Well, I have to admit that's a project of impulse. v1.0 took only 4 days.
 
 1. Too reliance on Python modules. I could join more original functions.
 2. ~~The structure of project is cumbersome, could be more optimization.~~
