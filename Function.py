@@ -33,7 +33,7 @@ def optionsFuction(cipherBook):
         choice = Menus.BookMenu()
         if choice == '1':
             # Modify_dict.modify(cipherBook)
-            Modify_dict.modify_dict(cipherBook.content)
+            Modify_dict.modify(cipherBook)
         elif choice == '2':
             Security.security(cipherBook)
         elif choice == '3':           # choose save or not

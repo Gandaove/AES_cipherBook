@@ -1,5 +1,5 @@
 # modify cipherBook
-from os import system
+from os import system, mkdir
 from time import sleep
 import Error_res
 import File
@@ -77,28 +77,28 @@ def deleteDic(content):
 def findDic(content):
     name = Input.stdin("Please enter the item's name you want to find(empty: print all): ")
     if name == '':
-        printDic(content, 0)
+        print(printDic(content))
         system('pause')
         return
 
     def find(content, name, road):          # find item's name(key or value)
-        if isinstance(content, dict):
+        if Error_res.judgeDictType(content):
             for key, value in content.items():
                 state = 0
-                if isinstance(value, File.Value):
+                if Error_res.judgeValueType(value):
                     if value.name == name:
                         print(road, end='')
                         print(key, ':', value.name)
                 elif name == key:
-                    if isinstance(value, dict):
+                    if Error_res.judgeDictType(value):
                         print(road + key, end='')
-                        printDic(content[name], 0)
+                        print(printDic(content[name]))
                     else:
                         print(road, end='')
                         print(key, ':', value.name)
                 else:                       # not found yet
                     road += key + ' --> '
-                    if not isinstance(value, dict):
+                    if not Error_res.judgeValueType(value):
                         road = road.replace(key + ' --> ', '')
                     find(value, name, road)
                 if not state:
@@ -107,20 +107,43 @@ def findDic(content):
     system('pause')
 
 
-def printDic(dic, t):
+def printDic(dic, t=0, string=''):
     if isinstance(dic, dict):
         for key, value in dic.items():
-            print('\n' + '\t' * t + key + ':', end='')
+            # print('\n' + '\t' * t + key + ':', end='')
+            string += '\n' + '\t' * t + key + ':'
             if isinstance(value, dict):
-                printDic(value, t + 1)
+                string = printDic(value, t+1, string)
             else:
-                print(' ' + value.name, end='')
+                # print(' ' + value.name, end='')
+                string += ' ' + value.name
     elif isinstance(dic, File.Value):
-        print(dic.name)
-    print()
+        # print(dic.name)
+        string += dic.name
+    # print()
+    # string += '\n'
+    return string
 
 
-def modify_dict(content, level=1):
+def saveAsPlain(content, bookname):
+    plain_dir = bookname + '/'
+    try:
+        mkdir(bookname)
+    except FileExistsError:
+        pass
+    def traverse(content):
+        for key, value in content.items():
+            if Error_res.judgeValueType(value):
+                if value.valuetype == 'bytes':
+                    value.writeFile(path=plain_dir+value.name, content=value.thing)
+            elif Error_res.judgeDictType(value):
+                traverse(content[key])
+    File.File.writeFile(path=plain_dir+bookname+'.txt', content=printDic(content).encode())
+    traverse(content)
+    print("Save Complete!")
+
+
+def modify_dict(content, bookname, level=1):
     funs = {'1': updateDic, '2': changeKeyName,
             '3': deleteDic, '4': findDic, '6': expandLevel}
     while True:
@@ -141,14 +164,15 @@ def modify_dict(content, level=1):
                 print('Latest level!')
                 sleep(1)
                 continue
-            modify_dict(content[name], level + 1)
+            modify_dict(content[name], bookname+'_'+name, level + 1)
         elif choice == '7':
+            saveAsPlain(content, bookname)
+            sleep(1)
+        elif choice == '8':
             break
         else:
             Error_res.wrongInput()
 
 
-# def modify(cipherBook):
-#     content = cipherBook.content
-#     modify_dict(cipherBook.content, 1)
-#     cipherBook.content = content
+def modify(cipherBook):
+    modify_dict(cipherBook.content, cipherBook.name)

@@ -33,13 +33,15 @@ class File():
         self._thing = thing
     
     # @Error_res.handle_exception
-    def readFile(self):             # read bytes file
-        with open(self._path, 'rb') as f:
+    @classmethod
+    def readFile(cls, path):             # read bytes file
+        with open(path, 'rb') as f:
             return f.read()
     
     # @Error_res.handle_exception
-    def writeFile(self, content):   # write bytes file
-        with open(self._path, 'wb') as f:
+    @classmethod
+    def writeFile(cls, path, content):   # write bytes file
+        with open(path, 'wb') as f:
             f.write(content)
 
 
@@ -69,10 +71,10 @@ class Value(File):
 
     def create(self, value):                 # filepath or just value
         try:
-            filepath = value.replace('/', '\\')        # reunion to windows path '\\'
+            filepath = value.replace('/', '\\')        # reunion to '/'
             self._path = filepath
-            self._name = value.rsplit('\\')[-1]      # with suffix
-            self._thing = self.readFile()
+            self._name = value.rsplit('/')[-1]      # with suffix
+            self._thing = self.readFile(self.path)
             self._valuetype = types[1]
         except FileNotFoundError:               # wrong file or just value
             self._thing, self._name = value, value
@@ -103,7 +105,7 @@ class File_SQLite(File):
     
     def create(self, filepath):
         self._path = filepath
-        self._name = filepath.rsplit('\\')[-1]
+        self._name = filepath.rsplit('/')[-1]
         self._conn = sqlite3.connect(filepath)
         self._cursor = self._conn.cursor()
         self.createTable()

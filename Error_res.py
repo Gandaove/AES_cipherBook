@@ -1,4 +1,5 @@
 # deal with error and quit
+from File import Value
 from os import system
 from sys import exit as Exit
 from time import sleep
@@ -34,6 +35,12 @@ def judgeNone(value):                # judge if the input is null, give a hint
 
 def judgeDictType(value):              # judge if is dict
     if isinstance(value, dict):
+        return True
+    return False
+
+
+def judgeValueType(value):              # judge if is dict
+    if isinstance(value, Value):
         return True
     return False
 

@@ -59,7 +59,7 @@ class BookCreate(Book):
     # @Error_res.handle_exception
     def writeBook(self):
         self.writePreProcess()
-        super().writeFile(Security.b64encode(self._question) + b'\n' +
+        super().writeFile(path=self.path, content=Security.b64encode(self._question) + b'\n' +
                           Security.hash_verify(self._key_input) + b'\n' 
                           + self._content)
 
@@ -110,7 +110,7 @@ class BookFromFile(BookCreate):
 
     @Error_res.handle_exception
     def readBook(self):
-        return super().readFile()#.decode()
+        return super().readFile(self.path)#.decode()
 
     def verify(self):
         while True:
