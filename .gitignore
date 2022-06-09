@@ -5,6 +5,7 @@ dist
 UI
 
 # file
+.gitignore
 AES_cipherBook_5.15.zip
 AES_cipherBook_6.5.zip
 arrow.png
