@@ -1,13 +1,15 @@
-# deal with error and quit
+# deal with error and judge type...
 from File import Value
+from pathlib import Path
 from os import system
 from sys import exit as Exit
 from time import sleep
 from MySQLdb import OperationalError
-# from functools import wraps
+from functools import wraps
 
 
 def handle_exception(func):
+    @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -26,9 +28,9 @@ def handle_exception(func):
     return wrapper
 
 
-def judgeNone(value):                # judge if the input is null, give a hint
+def judgeNotNone(value):                # judge if the input is null, give a hint
     if not value:
-        print('Your input is empty!')
+        print('This Value is empty!')
         return False
     return True
 
@@ -51,6 +53,18 @@ def judgeInKeys(value, keys):
     return False
 
 
+def fileExist(file):
+    if Path(file).is_file():
+        return True
+    return False
+
+
+def dirExist(path):
+    if Path(path).is_dir():
+        return True
+    return False
+
+
 def wrongInput():
     print('Wrong input!!!!')
     sleep(1.5)
@@ -69,3 +83,11 @@ def wrongConnect():
 def quitProgram():
     system('pause')
     Exit()
+
+
+def clearScreen():
+    system('cls')
+
+
+def pauseProgram():
+    system('pause')

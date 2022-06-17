@@ -1,11 +1,15 @@
-import sqlite3      # use sqlite3 to save data
+import Error_Res
+import sqlite3                  # use sqlite3 to save data
+from pathlib import Path
+
 
 types = ('str', 'bytes')
 
 class File():
     def __init__(self):
-        self._path, self._name = '', ''
-        self._thing = None
+        self._path = None       # type --> pathlib.Path
+        self._name = None       # type --> str
+        self._thing = None      # type --> str or bytes
 
     @property
     def name(self):
@@ -21,7 +25,6 @@ class File():
     
     @name.setter
     def name(self, name):
-        self._path = self._path.replace(self._name, name)
         self._name = name
     
     @path.setter
@@ -32,13 +35,13 @@ class File():
     def thing(self, thing):
         self._thing = thing
     
-    # @Error_res.handle_exception
+    # @Error_Res.handle_exception
     @classmethod
     def readFile(cls, path):             # read bytes file
         with open(path, 'rb') as f:
             return f.read()
     
-    # @Error_res.handle_exception
+    # @Error_Res.handle_exception
     @classmethod
     def writeFile(cls, path, content):   # write bytes file
         with open(path, 'wb') as f:
@@ -51,8 +54,11 @@ class Value(File):
         self._valuetype = ''
     
     @property
-    def __dict__(self):
+    def __dict__(self) -> dict:
         return {'Value.path': self._path, 'Value.name': self._name, 'Value.thing': self._thing, 'Value.valuetype': self._valuetype}
+
+    def __repr__(self) -> str:
+        return self._name
 
     @property
     def valuetype(self):
@@ -70,15 +76,14 @@ class Value(File):
         self._valuetype = diction['Value.valuetype']
 
     def create(self, value):                 # filepath or just value
-        try:
-            filepath = value.replace('/', '\\')        # reunion to '/'
-            self._path = filepath
-            self._name = value.rsplit('/')[-1]      # with suffix
-            self._thing = self.readFile(self.path)
+        path = Path(value)
+        self._path = path
+        if Error_Res.fileExist(path):
+            self._name = path.name
+            self._thing = self.readFile(path)
             self._valuetype = types[1]
-        except FileNotFoundError:               # wrong file or just value
-            self._thing, self._name = value, value
-            self._path = ''
+        else:
+            self._name, self._thing = value, value
             self._valuetype = types[0]
 
 
@@ -104,8 +109,9 @@ class File_SQLite(File):
         self._cursor = cursor
     
     def create(self, filepath):
-        self._path = filepath
-        self._name = filepath.rsplit('/')[-1]
+        self._path = Path(filepath)
+        self._name = self._path.name
         self._conn = sqlite3.connect(filepath)
         self._cursor = self._conn.cursor()
         self.createTable()
+        

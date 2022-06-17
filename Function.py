@@ -1,13 +1,12 @@
 # lead functions
 import Menus
-import Error_res
+import Error_Res
 import Modify_dict
 import Security
 import book
 import sql
 import Input
 from time import sleep
-from os import system
 
 
 def firstTime():
@@ -21,7 +20,7 @@ def firstTime():
 def hadBook():
     cipherBook = book.BookFromFile()
     cipherBook.run()
-    cipherBook.verify()
+    # cipherBook.verify()
     sleep(1)
     return optionsFuction(cipherBook)
 
@@ -29,10 +28,9 @@ def hadBook():
 # @Error_res.while_execute
 def optionsFuction(cipherBook):
     while True:
-        system('cls')
+        Error_Res.clearScreen()
         choice = Menus.BookMenu()
         if choice == '1':
-            # Modify_dict.modify(cipherBook)
             Modify_dict.modify(cipherBook)
         elif choice == '2':
             Security.security(cipherBook)
@@ -40,12 +38,12 @@ def optionsFuction(cipherBook):
             cipherBook.saveChange()
             break
         else:
-            Error_res.wrongInput()
+            Error_Res.wrongInput()
 
 
 def MySQLOperate():
     while True:
-        system('cls')
+        Error_Res.clearScreen()
         choice = Menus.MySQLMenu()
         if choice == '1':
             sql.saveToSQL()
@@ -56,15 +54,15 @@ def MySQLOperate():
         elif choice == '4':
             break
         else:
-            Error_res.wrongInput()
+            Error_Res.wrongInput()
 
 
 def Quit():
     decide = Input.stdin('Are you sure to exit? (y/n)')
     if decide == 'y' or decide == '':
         print('Goodbye!')
-        Error_res.quitProgram()
+        Error_Res.quitProgram()
     elif decide == 'n':
         pass
     else:
-        Error_res.wrongInput()
+        Error_Res.wrongInput()

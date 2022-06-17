@@ -3,12 +3,12 @@
 import MySQLdb
 import Security
 import book
-import Error_res
+import Error_Res
 from time import sleep
 
 
 class BookSQL(book.Book):                       # basic class
-    @Error_res.handle_exception
+    @Error_Res.handle_exception
     def __init__(self):
         super().__init__()
         self._user = 'bookuser'
@@ -21,7 +21,7 @@ class BookSQL(book.Book):                       # basic class
 
         self.connect.select_db('cipherBook')
 
-    @Error_res.handle_exception
+    @Error_Res.handle_exception
     def savetosql(self):
         # check if bookname exist in sql
         if not self.checksql(self._name):
@@ -43,7 +43,7 @@ class BookSQL(book.Book):                       # basic class
         self._content = data[0][3]
         self._name = data[0][0]
 
-    @Error_res.handle_exception
+    @Error_Res.handle_exception
     def write_file(self, path):
         with open(path, 'w', encoding='utf-8') as f1:
             f1.write(self._question + '\n')
@@ -60,7 +60,7 @@ class BookSQL(book.Book):                       # basic class
                 return True
         return False
 
-    @Error_res.handle_exception
+    @Error_Res.handle_exception
     def deletefromsql(self, name):
         delete = "delete from BookList where bookname = '{}'".format(name)
         if self.verify(name):
@@ -70,7 +70,7 @@ class BookSQL(book.Book):                       # basic class
         else:
             print("Wrong password!")
 
-    @Error_res.handle_exception
+    @Error_Res.handle_exception
     def updatetosql(self, name):
         update = "update BookList set name = '{}', set content = '{}', question = '{}', key_hash = '{}' where bookname = '{}'".format(
             name, self._content, self._question, self._key_input, self._name)
@@ -105,7 +105,7 @@ class BookSQL(book.Book):                       # basic class
 
 
 class BookFileToSQL(BookSQL, book.BookFromFile):
-    @Error_res.handle_exception
+    @Error_Res.handle_exception
     def __init__(self):
         super().__init__()
         self.run()

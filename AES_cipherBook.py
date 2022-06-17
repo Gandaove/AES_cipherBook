@@ -1,19 +1,19 @@
 # main
-import Error_res
+import Error_Res
 import Menus
 import Function
-from os import system
 
 
 def main():
     funs = {'1': Function.firstTime, '2': Function.hadBook, '3': Function.MySQLOperate, '4': Function.Quit}
     while True:
-        system('cls')
+        Error_Res.clearScreen()
         choice = Menus.MainMenu()
-        if choice in funs:
-            funs[choice]()
-        else:
-            Error_res.wrongInput()
+        if choice not in funs:
+            Error_Res.wrongInput()
+            continue
+        funs[choice]()
+            
 
 
 if __name__ == '__main__':

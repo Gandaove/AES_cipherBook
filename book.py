@@ -1,16 +1,18 @@
 # set class 'Book'
 import Security
 import Input
-import Error_res
+import Error_Res
 import File
-from time import sleep
 import _pickle as pickle                   # file as bin-flow
+from time import sleep
+from pathlib import Path
 
 
 class Book(File.File):
     def __init__(self):
         super().__init__()
-        self._content, self._key_input, self._question = {}, '', ''
+        self._content, self._key_input, self._question = {}, '', ''     # type --> dict, str, str
+        self._suffix = None              # book's suffix, type --> str
 
     @property
     def content(self):
@@ -23,6 +25,15 @@ class Book(File.File):
     @property
     def question(self):
         return self._question
+    
+    @property
+    def name(self):
+        return super().name
+    
+    @name.setter
+    def name(self, name):
+        self._path = self._path.with_name(self._name + self._suffix)
+        self._name = name
 
     @content.setter
     def content(self, content):
@@ -39,12 +50,14 @@ class Book(File.File):
 
 class BookCreate(Book):
     def run(self):
-        self._path = Input.stdin('Please input the path of your KEY file: \n').replace('\\', '/')
-        if not self._path:
-            Error_res.wrongInput()
+        path = Path(Input.stdin('Please input the path of your KEY file: \n'))
+        if not Error_Res.fileExist(path):
+            Error_Res.wrongInput()
             return
-        self._name = self._path.rsplit('/')[-1].rsplit('.', 1)[0]      # no suffix
-    
+        self._path = path
+        self._name = path.stem
+        self._suffix = path.suffix
+
     def writePreProcess(self):                  # change all File.Value to str
         def traverse(content):
             for key, value in content.items():
@@ -54,13 +67,14 @@ class BookCreate(Book):
                     traverse(value)
             return content
         self._content = traverse(self._content)
-        self._content = Security.pack(pickle.dumps(self._content), self._key_input)
+        self._content = Security.pack(
+            pickle.dumps(self._content), self._key_input)
 
     # @Error_res.handle_exception
     def writeBook(self):
         self.writePreProcess()
-        super().writeFile(path=self.path, content=Security.b64encode(self._question) + b'\n' +
-                          Security.hash_verify(self._key_input) + b'\n' 
+        super().writeFile(path=self._path, content=Security.b64encode(self._question) + b'\n' +
+                          Security.hash_verify(self._key_input) + b'\n'
                           + self._content)
 
     def saveChange(self):
@@ -81,25 +95,31 @@ class BookCreate(Book):
                     sleep(1)
                     break
                 else:
-                    Error_res.wrongInput()
+                    Error_Res.wrongInput()
 
 
 class BookFromFile(BookCreate):
-    @Error_res.handle_exception
+    @Error_Res.handle_exception
     def run(self):
         super().run()
+        if not Error_Res.fileExist(self._path):
+            Error_Res.wrongFile()
+            print("This is a empty book!")
+            return
         cipherBook = self.readBook().splitlines()
         self._question = Security.b64decode(cipherBook[0]).strip(b'\n')
         self._key_input = cipherBook[1].strip(b'\n')
         self._content = cipherBook[2].strip(b'\n')
-        # self.verify()
-    
+        self.verify()
+
     def loadPreProcess(self):                   # change all value to File.Value
-        self._content = pickle.loads(Security.unpack(self._content, self._key_input))
+        self._content = pickle.loads(
+            Security.unpack(self._content, self._key_input))
         valueabc = File.Value()
+
         def traverse(content):
             for key, value in content.items():
-                if isinstance(value, dict) and value.keys() == valueabc.__dict__.keys():
+                if Error_Res.judgeDictType(value) and value.keys() == valueabc.__dict__.keys():
                     obj = File.Value()
                     obj.__dict__ = value
                     content[key] = obj
@@ -108,15 +128,15 @@ class BookFromFile(BookCreate):
             return content
         self._content = traverse(self._content)
 
-    @Error_res.handle_exception
+    @Error_Res.handle_exception
     def readBook(self):
-        return super().readFile(self.path)#.decode()
+        return super().readFile(path=self._path)  # .decode()
 
     def verify(self):
         while True:
             print(self._question.decode())
             key_input = Input.stdin('Please input your Key: \n')
-            if not self._key_input == Security.hash_verify(key_input):
+            if self._key_input != Security.hash_verify(key_input):
                 print('Key wrong!', '\n')
                 continue
             print('Key correct!')

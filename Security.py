@@ -1,11 +1,10 @@
 # Security's function, change key or question
 import Menus
-import Error_res
+import Error_Res
 import Input
 from hashlib import sha512, sha256, md5
 from base64 import b64encode, b64decode
 from time import sleep
-from os import system
 from Crypto.Cipher import AES
 
 
@@ -19,18 +18,16 @@ def pkcs7_unpad(content):
 
 
 # Encrypt and Decrypt by AES (CBC)
-@Error_res.handle_exception
+@Error_Res.handle_exception
 def encrypt_AES(key, iv, content):
-    encrypt = AES.new(key, AES.MODE_CBC, iv)        # use CBC
-    # content_pad = pkcs7_pad(content).encode()
+    encrypt = AES.new(key, AES.MODE_CBC, iv)        # use CBC mode
     AES_encrypt = encrypt.encrypt(pkcs7_pad(content))
     return b64encode(AES_encrypt)
 
 
-@Error_res.handle_exception
+@Error_Res.handle_exception
 def decrypt_AES(key, iv, content):
     decrypt = AES.new(key, AES.MODE_CBC, iv)
-    # content = content.encode()
     AES_decrypt = decrypt.decrypt(b64decode(content))
     return pkcs7_unpad(AES_decrypt)
 
@@ -69,12 +66,12 @@ def unpack(content, key):
 
 def security(cipherBook):
     while True:
-        system('cls')
+        Error_Res.clearScreen()
         choices = Menus.SecurityMenu()
         if choices == 'a':
             key_change = Input.stdin('Please input your new key: ')
-            if not Error_res.judgeNone(key_change):
-                Error_res.wrongInput()
+            if not Error_Res.judgeNotNone(key_change):
+                Error_Res.wrongInput()
                 continue
             cipherBook.key_input = key_change
             print('Key changed!')
@@ -87,8 +84,8 @@ def security(cipherBook):
         elif choices == 'c':
             name = Input.stdin(
                 'Please input your new book name: (no need to add extension)')
-            if not Error_res.judgeNone(name):
-                Error_res.wrongInput()
+            if not Error_Res.judgeNotNone(name):
+                Error_Res.wrongInput()
                 continue
             cipherBook.name = name
             print('Book name changed!')
@@ -96,5 +93,5 @@ def security(cipherBook):
         elif choices == 'd':
             break
         else:
-            Error_res.wrongInput()
+            Error_Res.wrongInput()
     return cipherBook
