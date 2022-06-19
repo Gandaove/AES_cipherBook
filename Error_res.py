@@ -81,7 +81,7 @@ def wrongConnect():
 
 
 def quitProgram():
-    system('pause')
+    pauseProgram()
     Exit()
 
 

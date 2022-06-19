@@ -1,6 +1,7 @@
 # modify cipherBook
 from time import sleep
 from pathlib import Path
+from copy import deepcopy
 import Error_Res
 import File
 import Input
@@ -80,53 +81,46 @@ def findDic(content):
         print(printDic(content))
         Error_Res.pauseProgram()
         return
-
-    def find(content, name, road=''):          # find item's name(key or value)
-        if Error_Res.judgeDictType(content):
-            for key, value in content.items():
-                # state = 0
-                if Error_Res.judgeValueType(value):
-                    if value.name == name:
-                        road += key + ':' + value.name
-                elif name == key:
-                    if Error_Res.judgeDictType(value):
-                        road += key
-                        road += printDic(content[name], string=road)
-                    else:
-                        road += key + ':' + value.name
-                else:                       # not found yet
-                    road += key + ' --> '
-                    if not Error_Res.judgeValueType(value):
-                        road = road.replace(key + ' --> ', '')
-                    road = find(value, name, road)
-                # if not state:
-                #     road = road.replace(key + ' --> ', '')
-        return road
     
-    def findOptimize(content, name, road=''):
+    def removeReverse(li, key):
+        li.reverse()
+        li.remove(key)
+        li.reverse()
+        return li
+
+    def printroad(road):        # double list
+        road_str = ''
+        for i in road:
+            for j in i:
+                road_str += j + ' --> '
+            road_str = road_str[:-4] + '\n'
+        return road_str
+    
+    def findOptimize(content, name, road_save, road):       
+        # traverse all dict(even already finded)
+        # road_save: item of print
+        # road: save found path
         for key, value in content.items():
+            road.append(key)
             if name == key:
-                if Error_Res.judgeDictType(value):          # name equal key, and value is a dict (maybe empty)
-                    road += name + '(value is dict)(equal to key) ' + '\n'
-                    road += printDic(dic=content[name], string=road)
-                    break
-                else:                                       # name equal key, and value is Value
-                    road += name + '(value is Value)(equal to key) ' + value.__repr__() + '\n'
-                    break
-            elif name == value.__repr__():                  # name equal value.name
-                road += key + '(equal to value.name) ' + name + '\n'
-                break
-            else:                                           # name not equal key or value.name
-                # if Error_Res.judgeValueType(value):
-                #     road = road.replace(key + ' --> ', '', 1)
+                road_temp = deepcopy(road)
+                if Error_Res.judgeValueType(value):
+                    road_temp.append(value.__repr__())
                 if Error_Res.judgeDictType(value):
-                    road += key + ' --> '
-                    road = findOptimize(value, name, road)
-        return road
-    # print(find(content, name))
-    print(findOptimize(content, name))
-    Error_Res.pauseProgram()
-    return
+                    # print(printDic(value))
+                    road_temp.append(printDic(value))
+                road_save.append(road_temp)
+            if name == value.__repr__():
+                road_temp = deepcopy(road)
+                road_temp.append(value.__repr__())
+                road_save.append(road_temp)
+            if Error_Res.judgeDictType(value):
+                road_save = findOptimize(value, name, road_save, road)
+            road = removeReverse(road, key)
+        return road_save
+    
+    road = findOptimize(content, name, [], [])
+    print(printroad(road))
 
 
 def printDic(dic, t=0, string=''):

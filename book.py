@@ -9,6 +9,7 @@ from pathlib import Path
 
 
 class Book(File.File):
+    __slots__ = ('_content', '_key_input', '_question', '_suffix')
     def __init__(self):
         super().__init__()
         self._content, self._key_input, self._question = {}, '', ''     # type --> dict, str, str
@@ -49,11 +50,9 @@ class Book(File.File):
 
 
 class BookCreate(Book):
+    __slots__ = ()
     def run(self):
         path = Path(Input.stdin('Please input the path of your KEY file: \n'))
-        if not Error_Res.fileExist(path):
-            Error_Res.wrongInput()
-            return
         self._path = path
         self._name = path.stem
         self._suffix = path.suffix
@@ -99,6 +98,7 @@ class BookCreate(Book):
 
 
 class BookFromFile(BookCreate):
+    __slots__ = ()
     @Error_Res.handle_exception
     def run(self):
         super().run()

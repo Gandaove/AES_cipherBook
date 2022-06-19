@@ -6,6 +6,7 @@ from pathlib import Path
 types = ('str', 'bytes')
 
 class File():
+    __slots__ = ('_path', '_name', '_thing')
     def __init__(self):
         self._path = None       # type --> pathlib.Path
         self._name = None       # type --> str
@@ -49,6 +50,7 @@ class File():
 
 
 class Value(File):
+    __slots__ = ('_valuetype')
     def __init__(self):
         super().__init__()
         self._valuetype = ''
