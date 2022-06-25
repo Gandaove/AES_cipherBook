@@ -81,19 +81,13 @@ def findDic(content):
         print(printDic(content))
         Error_Res.pauseProgram()
         return
-    
-    def removeReverse(li, key):
-        li.reverse()
-        li.remove(key)
-        li.reverse()
-        return li
 
     def printroad(road):        # double list
         road_str = ''
         for i in road:
             for j in i:
                 road_str += j + ' --> '
-            road_str = road_str[:-4] + '\n'
+            road_str = road_str[:-5] + '\n\n'
         return road_str
     
     def findOptimize(content, name, road_save, road):       
@@ -102,7 +96,7 @@ def findDic(content):
         # road: save found path
         for key, value in content.items():
             road.append(key)
-            if name == key:
+            if name in key:                   # fuzzy match
                 road_temp = deepcopy(road)
                 if Error_Res.judgeValueType(value):
                     road_temp.append(value.__repr__())
@@ -110,17 +104,18 @@ def findDic(content):
                     # print(printDic(value))
                     road_temp.append(printDic(value))
                 road_save.append(road_temp)
-            if name == value.__repr__():
+            if name in value.__repr__() and Error_Res.judgeValueType(value):        # fuzzy match
                 road_temp = deepcopy(road)
                 road_temp.append(value.__repr__())
                 road_save.append(road_temp)
             if Error_Res.judgeDictType(value):
                 road_save = findOptimize(value, name, road_save, road)
-            road = removeReverse(road, key)
+            road.pop()
         return road_save
     
     road = findOptimize(content, name, [], [])
     print(printroad(road))
+    Error_Res.pauseProgram()
 
 
 def printDic(dic, t=0, string=''):

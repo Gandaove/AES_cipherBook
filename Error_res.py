@@ -36,33 +36,23 @@ def judgeNotNone(value):                # judge if the input is null, give a hin
 
 
 def judgeDictType(value):              # judge if is dict
-    if isinstance(value, dict):
-        return True
-    return False
+    return isinstance(value, dict)
 
 
 def judgeValueType(value):              # judge if is dict
-    if isinstance(value, Value):
-        return True
-    return False
+    return isinstance(value, Value)
 
 
 def judgeInKeys(value, keys):
-    if value in keys:
-        return True
-    return False
+    return value in keys
 
 
 def fileExist(file):
-    if Path(file).is_file():
-        return True
-    return False
+    return Path(file).is_file()
 
 
 def dirExist(path):
-    if Path(path).is_dir():
-        return True
-    return False
+    return Path(path).is_dir()
 
 
 def wrongInput():

@@ -33,7 +33,7 @@ class Book(File.File):
     
     @name.setter
     def name(self, name):
-        self._path = self._path.with_name(self._name + self._suffix)
+        self._path = self._path.with_name(name + self._suffix)
         self._name = name
 
     @content.setter
